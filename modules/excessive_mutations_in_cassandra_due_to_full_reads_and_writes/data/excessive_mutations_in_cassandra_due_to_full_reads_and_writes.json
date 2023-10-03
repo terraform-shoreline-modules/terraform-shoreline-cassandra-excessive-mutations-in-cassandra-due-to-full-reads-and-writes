@@ -1,0 +1,154 @@
+{
+  "name": "excessive_mutations_in_cassandra_due_to_full_reads_and_writes",
+  "description": "This incident type describes a problem where the number of mutations in a Cassandra database has reached an excessive level. This is usually caused by full reads and writes, which can lead to an increased number of changes within the database. Excessive mutations can cause performance issues and impact the overall stability of the system. Therefore, it is important to resolve this issue as soon as possible to ensure the system is running smoothly.",
+  "params": [
+    {
+      "name": "DATABASE_NAME",
+      "value": ""
+    },
+    {
+      "name": "SCHEMA_NAME",
+      "value": ""
+    },
+    {
+      "name": "KEYSPACE_TABLE",
+      "value": ""
+    },
+    {
+      "name": "STORAGE_NAME",
+      "value": ""
+    },
+    {
+      "name": "CACHE_NAME",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Excessive Mutations in Cassandra Due to Full Reads and Writes\nThis incident type describes a problem where the number of mutations in a Cassandra database has reached an excessive level. This is usually caused by full reads and writes, which can lead to an increased number of changes within the database. Excessive mutations can cause performance issues and impact the overall stability of the system. Therefore, it is important to resolve this issue as soon as possible to ensure the system is running smoothly."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if Cassandra is running"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `systemctl status cassandra.service`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Cassandra logs for errors"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `journalctl -u cassandra.service | grep ERROR`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Cassandra compaction history"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `nodetool compactionhistory`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Cassandra table statistics"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `nodetool tablestats ${KEYSPACE_TABLE}`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Cassandra node information"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `nodetool info`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check Cassandra system statistics"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `nodetool cfstats`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check for high I/O wait time"
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `iostat -x 1`"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check for high CPU usage"
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `top`"
+    },
+    {
+      "name": "cell_18",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Optimize Cassandra query performance to reduce the number of full reads and writes, and minimize the number of mutations caused by these operations. This can involve restructuring the database schema, introducing caching layers, or using alternative data storage solutions."
+    },
+    {
+      "name": "cell_19",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_optimize_schema_cache_storage_restart_service($DATABASE_NAME, $SCHEMA_NAME, $STORAGE_NAME, $CACHE_NAME)"
+    }
+  ]
+}
